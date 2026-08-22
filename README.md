@@ -25,11 +25,17 @@ Automated Offloading Orthotic Generator (Generative Parametric CAD Engine): Auto
 
 ## Technologies Used
 
-Python + NumPy + Pandas + OpenCV + PyTorch + FastAPI + React + SQLite + Open3D/Trimesh + STL
-
-**For Development**
-
-Google Colab + VS Code + Github
+- **Programming:** Python
+- **Data Processing:** NumPy, Pandas
+- **Computer Vision:** OpenCV
+- **Deep Learning:** PyTorch
+- **Backend:** FastAPI
+- **Frontend:** React
+- **Database:** SQLite
+- **3D Processing:** Open3D, Trimesh
+- **3D Model Format:** STL
+- **Development:** Google Colab, VS Code
+- **Version Control:** Git, GitHub
 
 
 ## Project Structure
@@ -41,53 +47,12 @@ Ortho_Sense-AI/
 ├── .gitignore
 │
 ├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── sample/
-│
 ├── notebooks/
-│   ├── data_analysis.ipynb
-│   ├── preprocessing.ipynb
-│   └── model_training.ipynb
-│
-├── models/
-│   ├── trained_model/
-│   └── model.py
-│
 ├── preprocessing/
-│   ├── image_processing.py
-│   └── pressure_processing.py
-│
-├── prediction/
-│   └── predict.py
-│
+├── models/
 ├── orthotic_engine/
-│   ├── foot_analysis.py
-│   ├── pressure_mapping.py
-│   ├── orthotic_design.py
-│   └── stl_generator.py
-│
-├── backend/
-│   ├── main.py
-│   ├── routes/
-│   │   ├── prediction.py
-│   │   └── orthotic.py
-│   └── services/
-│
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── package.json
-│
-├── outputs/
-│   ├── pressure_maps/
-│   ├── predictions/
-│   └── orthotic_models/
-│
-└── tests/
-    ├── test_preprocessing.py
-    ├── test_model.py
-    └── test_orthotic.py
+└── outputs/
+
 
 
 ## Current Progress
