@@ -75,5 +75,5 @@ Precision Dynamic Orthotic Fitting: Replace static, uncomfortable plaster casts 
 Lower Amputation Rates & Healthcare Savings: Save healthcare systems thousands of dollars per diabetic patient by preventing severe lower-limb ulcer complications.
 
 ## Team Members
-**Kritika Saxena** and
-**Mradul Khandelwal**
+-  **Kritika Saxena**
+-  **Mradul Khandelwal**
