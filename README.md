@@ -40,7 +40,7 @@ Automated Offloading Orthotic Generator (Generative Parametric CAD Engine): Auto
 
 ## Project Structure
 
-'''text
+```text
 Ortho_Sense-AI/
 │
 ├── README.md
