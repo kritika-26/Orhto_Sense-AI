@@ -1,7 +1,8 @@
 ## ORTHO SENSE AI
 # AI-Powered Podiatric Pressure Mapping and Diabetic Orthotic Printing Engine
 
-**About the Project**
+## About the Project
+
 "We are working on a system that analyzes foot pressure and uses the results to help design personalised orhtotics."
 
 ## Problem Statement
@@ -109,5 +110,5 @@ Precision Dynamic Orthotic Fitting: Replace static, uncomfortable plaster casts 
 Lower Amputation Rates & Healthcare Savings: Save healthcare systems thousands of dollars per diabetic patient by preventing severe lower-limb ulcer complications.
 
 ## Team Members
-**Kritika Saxena**
+**Kritika Saxena** and
 **Mradul Khandelwal**
