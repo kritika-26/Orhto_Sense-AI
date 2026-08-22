@@ -53,8 +53,7 @@ Ortho_Sense-AI/
 ├── models/
 ├── orthotic_engine/
 └── outputs/
-
-
+```
 
 ## Current Progress
 
