@@ -1,6 +1,10 @@
 # Virtual Environments and Cache
 venv/
 .venv/
+backend/venv/
+backend/Lib/
+backend/Include/
+backend/Scripts/
 __pycache__/
 *.pyc
 .env
