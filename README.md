@@ -1,4 +1,4 @@
-## ORTHO SENSE AI
+## Plantorix
 # AI-Powered Podiatric Pressure Mapping and Diabetic Orthotic Printing Engine
 
 ## About the Project
