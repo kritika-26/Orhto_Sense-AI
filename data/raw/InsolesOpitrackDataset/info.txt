@@ -1,0 +1,12 @@
+NOTES
+
+Takes with OptiTrack gaps repaired by interpolation (bones and bone markers only):
+- P3 M5 -> P3 M5.I
+- P3 M6 -> P3 M6.I
+- P13 M8 -> P13 M8.I
+- P13 M9 -> P13 M9.I
+- P15 M3 -> P15 M3.I
+
+Non-repairable takes:
+- P3 M8: OptiTrack data contain errors; this is not a local gap suitable for interpolation.
+- P13 M1: data are desynchronized due to a hardware issue in the insoles.

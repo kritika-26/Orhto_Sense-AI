@@ -1,0 +1,16 @@
+participant_code,height_cm,shoe_size_eu,weight_kg,physical_activity_level,age,sex,country
+P1,170,40,62,Moderate,25,Female,Spain
+P2,180,40,92,Moderate,25,Male,Spain
+P3,177,41,100,Moderate,22,Male,Spain
+P4,173,42,78,Moderate,22,Male,Spain
+P5,170,40,83,Moderate,22,Female,Spain
+P6,175,42,70,Moderate,22,Male,Spain
+P7,163,37,57,High,22,Female,Spain
+P8,175,43,73,Moderate,24,Male,Italy
+P9,173,41,75,Moderate,21,Male,Italy
+P10,163,39,58.5,Sedentary,19,Female,Spain
+P11,158,38,63,High,26,Female,Spain
+P12,175,41,64,Moderate,27,Male,Spain
+P13,175,42,88,Moderate,30,Male,Spain
+P14,168,38,50,High,23,Female,Spain
+P15,162,37,60,Moderate,21,Female,Lithuania
