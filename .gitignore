@@ -8,3 +8,5 @@ backend/Scripts/
 __pycache__/
 *.pyc
 .env
+.venv/
+backend/pyvenv.cfg
