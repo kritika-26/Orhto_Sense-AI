@@ -14,6 +14,7 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from backend import config
 from backend.schemas import models
@@ -130,3 +131,9 @@ def dataset_timeseries(
 @app.get("/api/datasets/{dataset_id}/validation", response_model=models.Validation)
 def dataset_validation(dataset_id: str = DatasetId):
     return analysis.validation(_load_or_http_error(dataset_id))
+
+
+# Serve the dashboard from the same server, so one command runs everything:
+# http://127.0.0.1:8000/   (registered last so the /api routes win)
+if config.FRONTEND_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=config.FRONTEND_DIR, html=True), name="frontend")
