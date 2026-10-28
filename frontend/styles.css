@@ -32,7 +32,7 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: 84px;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -95,13 +95,18 @@ input {
 .site-header {
     background: var(--card);
     border-bottom: 1px solid var(--line);
-    position: sticky;
-    top: 0;
     z-index: 20;
 }
 
+@media (min-width: 900px) and (min-height: 620px) {
+    .site-header {
+        position: sticky;
+        top: 0;
+    }
+}
+
 .header-inner {
-    max-width: 1200px;
+    max-width: 105rem;
     margin: 0 auto;
     padding: 10px 20px;
     display: flex;
@@ -204,7 +209,8 @@ input {
 
 /* Layout */
 main {
-    max-width: 1200px;
+    max-width: 105rem;
+    width: 100%;
     margin: 0 auto;
     padding: 20px;
     display: grid;
@@ -331,7 +337,7 @@ select {
 /* Summary cards */
 .cards {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
     gap: 12px;
 }
 
@@ -383,6 +389,7 @@ select {
 
 .heat-wrap {
     position: relative;
+    container-type: inline-size;
 }
 
 .heatgrid {
@@ -409,12 +416,12 @@ select {
 }
 
 .cell .i {
-    font-size: .7rem;
+    font-size: clamp(.55rem, 2.2cqi, .8rem);
     opacity: .85;
 }
 
 .cell .val {
-    font-size: .86rem;
+    font-size: clamp(.65rem, 2.8cqi, 1.05rem);
     font-weight: 600;
 }
 
@@ -662,7 +669,7 @@ td {
 
 .chart-box {
     position: relative;
-    height: 270px;
+    height: 17rem;
 }
 
 .chart-card p.small {
@@ -747,7 +754,7 @@ td {
 }
 
 footer {
-    max-width: 1200px;
+    max-width: 105rem;
     margin: 0 auto;
     padding: 4px 20px 32px;
     color: var(--ink-soft);
@@ -755,9 +762,6 @@ footer {
 }
 
 @media (max-width: 980px) {
-    .cards {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
 
     .viz,
     .charts {
@@ -779,24 +783,12 @@ footer {
         padding: 14px;
     }
 
-    .cards {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .selectors {
         gap: 12px;
     }
 
     .heatgrid {
         gap: 4px;
-    }
-
-    .cell .val {
-        font-size: .74rem;
-    }
-
-    .cell .i {
-        font-size: .62rem;
     }
 
     .header-inner {
