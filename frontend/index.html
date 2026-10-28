@@ -1,130 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plantorix - Podiatric Pressure Mapping & Orthotic Engine</title>
-    <!-- Tailwind CSS for modern styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Plantorix - Plantar Pressure Analysis &amp; Orthotic Research Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js, pinned version, loaded from cdnjs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-    <!-- Header -->
-    <header class="bg-white border-b border-slate-200 py-4 px-8 shadow-sm">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold text-teal-700 flex items-center gap-2">
-                🏥 Plantorix Orthotic Suite
-            </h1>
-            <span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">Backend API: Online</span>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="#top" aria-label="Plantorix home">
+                <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+                    <rect width="34" height="34" rx="9" fill="#0e5a6e" />
+                    <path
+                        d="M17 6c-4 0-6.5 3.2-6.5 7.2 0 3 1.2 4.6 1.2 7.3 0 2.6-1.6 3.7-1.6 5.3 0 1.6 1.7 2.2 4.1 2.2h5.6c2.4 0 4.1-.9 4.1-3 0-2.2-1.7-3.4-1.7-6 0-2.7 1.4-4.2 1.4-7.4C23.6 8.9 21 6 17 6z"
+                        fill="#fff" opacity=".95" />
+                    <circle cx="15" cy="12" r="1.7" fill="#4f7d65" />
+                    <circle cx="19.5" cy="14.5" r="1.7" fill="#4f7d65" />
+                    <circle cx="15.5" cy="19" r="1.7" fill="#4f7d65" />
+                </svg>
+                <span><span class="brand-name">Plantorix</span><br><span class="brand-sub">Plantar Pressure Analysis
+                        &amp; Orthotic Research Platform</span></span>
+            </a>
+            <nav class="nav" aria-label="Sections">
+                <a href="#overview">Overview</a><a href="#visualization">Pressure map</a><a href="#charts">Charts</a><a
+                    href="#quality">Data quality</a><a href="#orthotic">Orthotic design</a>
+            </nav>
+            <span id="apiStatus" class="status-pill" role="status" aria-live="polite"><span class="dot"></span><span
+                    id="apiStatusText">Checking API...</span></span>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="max-w-7xl mx-auto flex-grow p-6 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-        
-        <!-- Left Card: Patient Input Panel -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
-            <div>
-                <h2 class="text-lg font-semibold text-slate-900 mb-4">Patient Biometric Input</h2>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">Patient Body Weight (kg)</label>
-                        <input type="number" id="weight" value="70" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">Foot Length (cm)</label>
-                        <input type="number" id="footLength" value="26.5" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">Neuropathy Risk Scale (1 - 5)</label>
-                        <input type="number" id="riskScale" min="1" max="5" value="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none">
+    <main id="top">
+        <div class="disclaimer">Research and educational prototype. It is not a clinically validated medical device, and
+            the dataset is not a diabetic-foot cohort. Nothing shown here is a diagnosis or risk prediction.</div>
+        <div id="errorBanner" class="banner error hidden" role="alert"><span id="errorText"></span><button class="btn"
+                id="retryBtn">Try again</button></div>
+        <div id="issueBanner" class="banner warn hidden"></div>
+
+        <section class="card" aria-labelledby="selTitle">
+            <div class="selectors">
+                <h2 id="selTitle" class="hidden">Choose a recording</h2>
+                <div class="field"><label for="selParticipant">Participant</label><select id="selParticipant"
+                        disabled></select></div>
+                <div class="field"><label for="selTake">Take</label><select id="selTake" disabled></select></div>
+                <div class="field"><span class="label">Insole</span>
+                    <div class="seg" role="group" aria-label="Insole side">
+                        <button id="sideL" aria-pressed="false" disabled>Left</button><button id="sideR"
+                            aria-pressed="false" disabled>Right</button>
                     </div>
                 </div>
+                <div class="rec-meta small muted" id="recMeta">Loading recordings...</div>
             </div>
+        </section>
 
-            <button onclick="runPressureAnalysis()" class="mt-6 w-full bg-teal-600 hover:bg-teal-700 text-white font-medium py-3 rounded-xl transition shadow-md">
-                Run Pressure Analysis
-            </button>
-        </div>
-
-        <!-- Right Card: Results & Output Panel -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
-            <div>
-                <h2 class="text-lg font-semibold text-slate-900 mb-4">AI Simulation & Clinical Output</h2>
-                
-                <div id="outputPlaceholder" class="text-slate-400 text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
-                    Run analysis to generate pressure distribution matrix and recommendations.
+        <section id="overview" aria-label="Overview">
+            <div class="cards">
+                <div class="stat" id="cardStatus">
+                    <div class="k">Dataset status</div>
+                    <div class="v text" id="vStatus">Waiting</div>
+                    <div class="s" id="sStatus">&nbsp;</div>
                 </div>
-
-                <div id="resultCard" class="hidden space-y-4">
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <p class="text-sm text-slate-500">Peak Plantar Pressure</p>
-                        <p id="peakPressure" class="text-2xl font-bold text-teal-700">0 kPa</p>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <p class="text-sm text-slate-500">Clinical Status</p>
-                        <p id="clinicalStatus" class="text-lg font-semibold text-slate-800">-</p>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <p class="text-sm text-slate-500">Recommended Insole Offloading Depth</p>
-                        <p id="offloadingDepth" class="text-lg font-semibold text-rose-600">0.0 mm</p>
-                    </div>
+                <div class="stat">
+                    <div class="k">Pressure sensors</div>
+                    <div class="v num" id="vSensors">-</div>
+                    <div class="s">channels in file</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Frames in recording</div>
+                    <div class="v num" id="vFrames">-</div>
+                    <div class="s">rows in CSV</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Current frame</div>
+                    <div class="v num" id="vFrame">-</div>
+                    <div class="s">0-based index</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Frame maximum</div>
+                    <div class="v num" id="vMax">-</div>
+                    <div class="s" id="sMax">recorded sensor value</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Frame average</div>
+                    <div class="v num" id="vMean">-</div>
+                    <div class="s">recorded sensor value</div>
                 </div>
             </div>
+        </section>
 
-            <div class="mt-6">
-                <button onclick="alert('Insole blueprint approved for 3D printer export!')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 rounded-xl transition shadow-md">
-                    Approve & Export Blueprint
-                </button>
+        <section id="visualization" class="card" aria-labelledby="vizTitle">
+            <div class="card-head">
+                <h2 id="vizTitle">Sensor intensity map</h2><span class="small muted">Colour = recorded sensor value (raw
+                    counts, not kPa)</span>
             </div>
-        </div>
+            <div class="viz">
+                <div>
+                    <div class="layout-note" id="layoutNote">Unregistered sensor layout: cells are arranged by CSV
+                        sensor index (0 to 31), not by position on the foot. The anatomical mapping has not been
+                        verified.</div>
+                    <div class="heat-wrap">
+                        <div class="heatgrid" id="heatgrid" role="group" aria-label="Pressure sensors by CSV index">
+                        </div>
+                        <div class="overlay" id="heatOverlay"><span><span class="spinner"></span>Loading
+                                recording...</span></div>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-bar" id="legendBar"></div>
+                        <div class="legend-labels"><span id="legMin" class="num">-</span><span>Recorded sensor
+                                value</span><span id="legMax" class="num">-</span></div>
+                        <div class="key-row"><span><span class="key-swatch"></span>Above this frame's
+                                average</span><span>Dark border: selected sensor</span></div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn" id="prevBtn" aria-label="Previous frame" disabled>&#9664; Prev</button>
+                        <button class="btn primary" id="playBtn" disabled>Play</button>
+                        <button class="btn" id="nextBtn" aria-label="Next frame" disabled>Next &#9654;</button>
+                        <input type="range" id="slider" min="0" max="0" value="0" aria-label="Frame" disabled>
+                        <span class="small num" id="sliderLabel">0 / 0</span>
+                    </div>
+                    <div class="detail" id="detail" aria-live="polite"><span class="muted">Hover or click a sensor to
+                            see its index and exact recorded value.</span></div>
+                </div>
+                <div class="analysis">
+                    <h3>Frame analysis</h3>
+                    <dl>
+                        <dt>Mean of 32 sensors</dt>
+                        <dd class="num" id="aMean">-</dd>
+                        <dt>Maximum</dt>
+                        <dd class="num" id="aMax">-</dd>
+                        <dt>Minimum</dt>
+                        <dd class="num" id="aMin">-</dd>
+                        <dt>Total of 32 sensors</dt>
+                        <dd class="num" id="aTotal">-</dd>
+                        <dt>Above frame average</dt>
+                        <dd class="num" id="aAbove">-</dd>
+                    </dl>
+                    <div class="chips" id="chips"></div>
+                    <p class="small muted" style="margin-top:10px">Above-average sensors are a relative comparison
+                        inside this one frame. They are not clinical pressure hotspots.</p>
+                    <details>
+                        <summary>Show frame values as a table</summary>
+                        <div class="table-scroll">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Sensor (CSV index)</th>
+                                        <th>Recorded value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="frameTable"></tbody>
+                            </table>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
 
+        <section id="charts" class="charts" aria-label="Charts">
+            <div class="card chart-card">
+                <h3>Sensor readings, selected frame</h3>
+                <p class="small muted">Dark bars are above this frame's average.</p>
+                <div class="chart-box"><canvas id="chBars" role="img"
+                        aria-label="Bar chart of the 32 sensor readings in the selected frame"></canvas></div>
+            </div>
+            <div class="card chart-card">
+                <h3>Total sensor reading across the recording</h3>
+                <p class="small muted">Sum of the 32 channels per frame. The vertical line marks the selected frame.</p>
+                <div class="chart-box"><canvas id="chTotal" role="img"
+                        aria-label="Line chart of the total sensor reading per frame"></canvas></div>
+            </div>
+            <div class="card chart-card">
+                <div class="card-head" style="margin-bottom:0">
+                    <h3>Single sensor across the recording</h3><span class="field"
+                        style="display:flex;gap:6px;align-items:center;flex-direction:row"><label for="selSensor">Sensor
+                            (CSV index)</label><select id="selSensor" style="min-width:70px"></select></span>
+                </div>
+                <p class="small muted">Click a sensor on the map to switch.</p>
+                <div class="chart-box"><canvas id="chSensor" role="img"
+                        aria-label="Line chart of one sensor over time"></canvas></div>
+            </div>
+            <div class="card chart-card">
+                <h3>Calculated sum vs recorded sumP</h3>
+                <p class="small muted" id="cmpNote">&nbsp;</p>
+                <div class="chart-box"><canvas id="chCompare" role="img"
+                        aria-label="Comparison of calculated sensor sum and the sumP column"></canvas></div>
+            </div>
+        </section>
+
+        <section id="quality" class="card" aria-labelledby="dqTitle">
+            <div class="card-head">
+                <h2 id="dqTitle">Data quality</h2><span class="small muted">Raw data is never repaired, normalised or
+                    overwritten</span>
+            </div>
+            <div class="dq">
+                <div class="dq-item">
+                    <div class="k">Recording dimensions</div>
+                    <div class="v num" id="dqDims">-</div>
+                </div>
+                <div class="dq-item">
+                    <div class="k">Sensor channels</div>
+                    <div class="v num" id="dqSensors">-</div>
+                </div>
+                <div class="dq-item">
+                    <div class="k">Missing values</div>
+                    <div class="v num" id="dqMissing">-</div>
+                </div>
+                <div class="dq-item">
+                    <div class="k">Sensor sum matches sumP</div>
+                    <div class="v" id="dqSump">-</div>
+                </div>
+                <div class="dq-item">
+                    <div class="k">Value range in this recording</div>
+                    <div class="v num" id="dqRange">-</div>
+                </div>
+                <div class="dq-item">
+                    <div class="k">File</div>
+                    <div class="v" id="dqFile">-</div>
+                </div>
+            </div>
+            <ul class="warn-list" id="dqWarnings"></ul>
+            <details>
+                <summary>Available columns</summary>
+                <ul class="cols" id="dqCols"></ul>
+            </details>
+        </section>
+
+        <section id="orthotic" class="card" aria-labelledby="orthTitle">
+            <div class="card-head">
+                <h2 id="orthTitle">Orthotic Design &mdash; Prototype</h2><span class="small muted">Conceptual workflow
+                    only</span>
+            </div>
+            <ol class="steps" id="orthSteps"></ol>
+            <p class="small muted">No offloading depth, material or region is proposed. Those need a verified
+                sensor-to-foot mapping, validated clinical criteria and a labelled patient dataset, none of which this
+                prototype has. The design is not clinically safe, manufacturing-ready or validated for any individual.
+            </p>
+            <button class="btn accent" id="exportBtn" disabled>Download analysis summary (JSON)</button>
+            <span class="small muted" id="exportNote" style="margin-left:8px">The file holds the selected frame's values
+                and plainly labelled, non-clinical fields.</span>
+        </section>
     </main>
+    <footer>Plantorix &middot; data: multimodal insole and motion-capture gait dataset (Zenodo 20156243, CC BY 4.0)
+        &middot; values are raw sensor counts (documented range 0 to 4096), not kPa.</footer>
 
-    <!-- JavaScript to connect Frontend to FastAPI Backend -->
-    <script>
-        async function runPressureAnalysis() {
-            const weight = parseFloat(document.getElementById('weight').value);
-            const footLength = parseFloat(document.getElementById('footLength').value);
-            const neuropathyRisk = parseInt(document.getElementById('riskScale').value);
-
-            const payload = {
-                weight_kg: weight,
-                foot_length_cm: footLength,
-                neuropathy_risk: neuropathyRisk
-            };
-
-            try {
-                // Fetch request sent to your running FastAPI backend
-                const response = await fetch('http://127.0.0.1:8000/predict-pressure', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    // Hide placeholder and show result fields
-                    document.getElementById('outputPlaceholder').classList.add('hidden');
-                    document.getElementById('resultCard').classList.remove('hidden');
-
-                    // Populate data into UI elements
-                    document.getElementById('peakPressure').innerText = `${data.peak_pressure_kpa} kPa`;
-                    document.getElementById('clinicalStatus').innerText = data.clinical_status;
-                    document.getElementById('offloadingDepth').innerText = `${data.recommended_offloading_depth_mm} mm`;
-                }
-            } catch (error) {
-                alert('Error connecting to backend server. Make sure FastAPI is running!');
-                console.error(error);
-            }
-        }
-    </script>
+    <script src="js/api.js"></script>
+    <script src="js/heatmap.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
 </body>
-</html>
 
+</html>
