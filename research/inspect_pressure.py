@@ -1,127 +1,61 @@
+"""Quick look at one pressure recording (exploration script, not part of the app).
+
+Run from the project root:
+
+    pip install matplotlib
+    python research/inspect_pressure.py                       # default recording
+    python research/inspect_pressure.py P15/M3.I/M3.I_Preassure_L.csv --frame 100
+
+The path is relative to the dataset folder, so it works on any computer.
+"""
+
+import argparse
+import sys
+from pathlib import Path
 
 import pandas as pd
-import matplotlib.pyplot as plt
 
-# Replace this with the actual path to your CSV file
-CSV_PATH = r"C:\Users\mradu\Desktop\Plantorix\data\raw\InsolesOpitrackDataset\P1\M1\M1_Preassure_L.csv"
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from backend import config  # noqa: E402
 
-df = pd.read_csv(CSV_PATH)
+parser = argparse.ArgumentParser()
+parser.add_argument("csv", nargs="?", default="P1/M1/M1_Preassure_L.csv",
+                    help="path relative to the dataset folder")
+parser.add_argument("--frame", type=int, default=50)
+parser.add_argument("--no-plots", action="store_true")
+args = parser.parse_args()
 
-# Select the 32 pressure sensor columns
-sensor_cols = [
-    col for col in df.columns
-    if col.startswith("PressureSensor ")
-]
-
-pressure = df[sensor_cols]
+df = pd.read_csv(config.DATASET_DIR / args.csv)
+pressure = df[config.SENSOR_COLUMNS]
+frame = min(args.frame, len(df) - 1)
 
 print("Dataset shape:", df.shape)
-print("Number of pressure sensors:", len(sensor_cols))
-print("Missing values:", df.isnull().sum().sum())
+print("Number of pressure sensors:", len(config.SENSOR_COLUMNS))
+print("Missing values:", int(df.isnull().sum().sum()))
 
-print("\nPressure sensor statistics:")
-print(pressure.describe().round(2))
+calculated = pressure.sum(axis=1)
+print("\nAverage calculated sum:", round(calculated.mean(), 2))
+print("Maximum individual sensor value:", int(pressure.max().max()))
 
-# # Plot sensor readings across the recording
-# plt.figure(figsize=(14, 6))
-# plt.imshow(
-#     pressure.T,
-#     aspect="auto",
-#     cmap="inferno",
-#     interpolation="nearest"
-# )
-# plt.colorbar(label="Recorded sensor value")
-# plt.xlabel("Frame / Row")
-# plt.ylabel("Pressure sensor")
-# plt.title("Plantorix: Left Insole Pressure Readings")
-# plt.tight_layout()
-# plt.show()
-
-
-
-# Calculate simple pressure statistics for each frame
-df["calculated_sum"] = pressure.sum(axis=1)
-df["max_sensor_value"] = pressure.max(axis=1)
-df["active_sensors"] = (pressure > 0).sum(axis=1)
-
-print("\nOverall pressure statistics:")
-print("Average calculated sum:", round(df["calculated_sum"].mean(), 2))
-print("Maximum calculated sum:", round(df["calculated_sum"].max(), 2))
-print("Maximum individual sensor value:", df["max_sensor_value"].max())
-print("Average active sensors:", round(df["active_sensors"].mean(), 2))
-
-# Plot total recorded sensor values across frames
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(12, 4))
-plt.plot(df["calculated_sum"])
-plt.xlabel("Frame / Row")
-plt.ylabel("Sum of sensor values")
-plt.title("Plantorix: Total Sensor Reading Across Frames")
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-
-
-
-
-print("\n--- sumP Validation ---")
-
-if "sumP" in df.columns:
-    comparison = pd.DataFrame({
-        "sumP": df["sumP"],
-        "calculated_sum": pressure.sum(axis=1)
-    })
-
-    comparison["difference"] = (
-        comparison["sumP"] - comparison["calculated_sum"]
-    )
-
-    print(comparison.head(10).round(2))
-    print("\nMean absolute difference:",
-          round(comparison["difference"].abs().mean(), 2))
-
-    print("Correlation:",
-          round(comparison["sumP"].corr(
-              comparison["calculated_sum"]
-          ), 4))
+print("\n--- sumP validation ---")
+if config.SUMP_COLUMN in df.columns:
+    diff = (df[config.SUMP_COLUMN] - calculated).abs()
+    print("Largest difference between sumP and calculated sum:", diff.max())
 else:
     print("sumP column not found.")
-    print("Available columns:", df.columns.tolist())
 
+values = pressure.iloc[frame]
+above = values[values > values.mean()].sort_values(ascending=False)
+print(f"\nFrame {frame}: mean {values.mean():.2f}")
+print("Sensors above this frame's average (relative comparison only):")
+print(above.to_string())
 
-
-
-import matplotlib.pyplot as plt
-
-# Select one frame to inspect
-frame_index = 50
-
-values = pressure.iloc[frame_index].values
-labels = [f"S{i}" for i in range(32)]
-
-plt.figure(figsize=(14, 5))
-plt.bar(labels, values)
-plt.xlabel("Pressure sensor index")
-plt.ylabel("Recorded sensor value")
-plt.title(f"Plantorix: Sensor Readings at Frame {frame_index}")
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.show()
-
-
-
-# Identify sensors with readings above the frame average
-frame_index = 50
-values = pressure.iloc[frame_index]
-
-frame_avg = values.mean()
-high_sensors = values[values > frame_avg].sort_values(
-    ascending=False
-)
-
-print(f"\nFrame: {frame_index}")
-print(f"Average sensor reading: {frame_avg:.2f}")
-print("\nSensors above frame average:")
-
-print(high_sensors.to_string())
+if not args.no_plots:
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(2, 1, figsize=(12, 7))
+    axes[0].plot(calculated.values)
+    axes[0].set(title="Total sensor reading per frame", xlabel="Frame", ylabel="Sum of sensor values")
+    axes[1].bar(range(32), values.values)
+    axes[1].set(title=f"Sensor readings, frame {frame}", xlabel="Sensor (CSV index)", ylabel="Recorded sensor value")
+    plt.tight_layout()
+    plt.show()
