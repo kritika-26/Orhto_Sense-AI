@@ -1,12 +1,17 @@
-# Virtual Environments and Cache
+# Virtual environments and Python cache
 venv/
 .venv/
 backend/venv/
-backend/Lib/
-backend/Include/
-backend/Scripts/
+backend/pyvenv.cfg
 __pycache__/
 *.pyc
+.pytest_cache/
 .env
-.venv/
-backend/pyvenv.cfg
+
+# Generated files
+outputs/*.json
+outputs/*.png
+
+# Large raw data is not needed in Git. If you remove it from the repo later,
+# download it from https://zenodo.org/records/20156243 and uncomment:
+# data/raw/
