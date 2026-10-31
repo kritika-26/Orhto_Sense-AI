@@ -128,6 +128,7 @@
       if (token !== state.loadToken) return;      // a newer selection took over
       Object.assign(state, { summary, series, validation, frame: 0 });
       renderRecording();
+      state.steps = null; loadSteps(id, token);
       await ensureDiagram();
       await showFrame(0);
       await loadSensorSeries(state.sensor);
@@ -401,6 +402,47 @@
   }
 
 
+
+  /* ---------- Step analysis (label-free) ---------- */
+  function renderSteps(d) {
+    state.steps = d;
+    const st = d.stats;
+    $("stepMethod").textContent = d.method;
+    const cell = (k, v) => '<div class="dq-item"><div class="k">' + k + '</div><div class="v num">' + v + "</div></div>";
+    $("stepStats").innerHTML =
+      cell("Complete steps found", st.complete_steps) +
+      cell("Typical step length", st.median_frames == null ? "-" : fmt(st.median_frames) + " frames") +
+      cell("Length variation", st.frames_variation_pct == null ? "-" : fmt(st.frames_variation_pct) + " %") +
+      cell("Typical pattern difference", st.median_pattern_distance == null ? "-" : st.median_pattern_distance.toFixed(3) + " (0 = identical)") +
+      cell("Steps that differ", d.steps.filter(x => x.differs).length);
+    const W = 800, H = 120, n = d.frame_count, hi = Math.max(...d.total), lo = Math.min(...d.total), span = (hi - lo) || 1;
+    const X = i => (i / Math.max(n - 1, 1) * W).toFixed(1), Y = v => (H - 8 - (v - lo) / span * (H - 16)).toFixed(1);
+    let svg = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" role="img" aria-label="Total sensor reading with detected steps shaded">';
+    d.steps.forEach(s => {
+      svg += '<rect x="' + X(s.start_frame) + '" y="0" width="' + Math.max(X(s.end_frame) - X(s.start_frame), 1) + '" height="' + H + '" fill="' +
+        (s.differs ? "#e8a590" : s.complete ? "#cfe3dc" : "#e3e8ea") + '" opacity=".75"/>';
+    });
+    svg += '<polyline fill="none" stroke="#0e5a6e" stroke-width="1.5" vector-effect="non-scaling-stroke" points="' +
+      d.total.map((v, i) => X(i) + "," + Y(v)).join(" ") + '"/>';
+    svg += "</svg>";
+    $("stepStrip").innerHTML = svg +
+      '<div class="small muted">Green = complete step, grey = cut off at the file edge, coral = pattern differs from this recording\'s other steps.</div>';
+    $("stepNotes").innerHTML = d.notes.map(t => "<li>" + escapeHtml(t) + "</li>").join("");
+    $("stepTable").innerHTML = d.steps.map(s => "<tr><td>" + s.step + "</td><td>" + s.start_frame + "–" + s.end_frame + "</td><td>" + s.frames +
+      "</td><td>" + fmt(s.peak_total) + "</td><td>" + (s.pattern_distance == null ? "-" : s.pattern_distance.toFixed(3)) + "</td><td>" +
+      (!s.complete ? "cut off" : s.differs ? "differs" : "typical") + "</td></tr>").join("");
+  }
+  async function loadSteps(id, token) {
+    try {
+      const d = await Api.get("/api/datasets/" + id + "/steps");
+      if (token === state.loadToken) renderSteps(d);
+    } catch (err) {
+      if (token !== state.loadToken) return;
+      $("stepStats").innerHTML = ""; $("stepStrip").innerHTML = "";
+      $("stepNotes").innerHTML = "<li>Step analysis could not be loaded: " + escapeHtml(err.message) + "</li>";
+    }
+  }
+
   /* ---------- Printable report (built only from loaded data) ---------- */
   function sparkline(vals, w, h) {
     const lo = Math.min(...vals), hi = Math.max(...vals), span = (hi - lo) || 1;
@@ -421,6 +463,10 @@
       "<dt>Value range</dt><dd>" + s.value_min + " to " + s.value_max + " (raw counts, not kPa)</dd>" +
       "<dt>Highest total reading</dt><dd>" + fmt(Math.max(...t.calculated_sum)) + " at frame " + peakIdx + "</dd></dl>";
     h += "<h3>Total sensor reading across the recording</h3>" + sparkline(t.calculated_sum, 600, 90);
+    if (state.steps) { const st = state.steps.stats;
+      h += "<h3>Step analysis (label-free)</h3><p class='small'>" + st.complete_steps + " complete step(s)" +
+        (st.median_frames != null ? ", typical length " + fmt(st.median_frames) + " frames, " + state.steps.steps.filter(x => x.differs).length + " differing from the others" : "") +
+        ". Descriptive only, not a diagnosis.</p>" + $("stepStrip").innerHTML; }
     h += "<h3>Data quality</h3><ul><li>Missing values: " + v.missing_values + "</li><li>Sensor sum vs sumP: " +
       (!sp.available ? "sumP not available" : sp.matches_exactly ? "identical in all " + v.rows + " frames" : sp.frames_with_difference + " frame(s) differ (max " + sp.max_abs_difference + ")") + "</li>" +
       v.warnings.map(w => "<li>" + escapeHtml(w) + "</li>").join("") + (s.known_issue ? "<li>Dataset note: " + escapeHtml(s.known_issue) + "</li>" : "") + "</ul>";

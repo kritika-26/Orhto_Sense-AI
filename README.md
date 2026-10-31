@@ -15,6 +15,7 @@ A research and educational prototype that loads plantar-pressure recordings from
 - Calculations are plain descriptive statistics on the real sensor values: mean, maximum, minimum, total, sensors above the frame average, and a check of the sensor sum against the recorded `sumP` column.
 - Raw data is only read, never modified.
 - **Branding and report (Phase 7):** Plantorix logo, app icon and icon set (`frontend/assets/`), and a printable one-page **Recording report** (summary, data quality, layout status, optional orthotic design) that can be saved as PDF from the browser. Chart.js is bundled in `frontend/vendor/` so the demo works offline.
+- **Step analysis (Phase 8, label-free ML):** `GET /api/datasets/{id}/steps` splits a recording into steps (runs of frames above the recording's own resting level) and compares each complete step's 32-sensor peak pattern with the median step of the same recording (robust z-score, cut-off 3.5, needs at least 5 complete steps to flag anything). Nothing is trained and nothing is predicted; no frame rate is documented, so lengths are in frames. Across all 310 recordings: median 3 complete steps, 10 very short recordings have none, 4 of 1,041 complete steps were flagged (P7 only).
 
 ## What it does not do (yet)
 

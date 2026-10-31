@@ -17,7 +17,7 @@
       <span><span class="brand-name">Plantorix</span><br><span class="brand-sub">Plantar Pressure Analysis &amp; Orthotic Research Platform</span></span>
     </a>
     <nav class="nav" aria-label="Sections">
-      <a href="#overview"><img class="ico" src="assets/icons/dataset.png" alt="" width="20" height="20">Overview</a><a href="#visualization"><img class="ico" src="assets/icons/pressure.png" alt="" width="20" height="20">Pressure map</a><a href="#charts"><img class="ico" src="assets/icons/visualization.png" alt="" width="20" height="20">Charts</a><a href="#quality"><img class="ico" src="assets/icons/info.png" alt="" width="20" height="20">Data quality</a><a href="#orthotic"><img class="ico" src="assets/icons/orthotic.png" alt="" width="20" height="20">Orthotic design</a><a href="#report"><img class="ico" src="assets/icons/reports.png" alt="" width="20" height="20">Report</a>
+      <a href="#overview"><img class="ico" src="assets/icons/dataset.png" alt="" width="20" height="20">Overview</a><a href="#visualization"><img class="ico" src="assets/icons/pressure.png" alt="" width="20" height="20">Pressure map</a><a href="#charts"><img class="ico" src="assets/icons/visualization.png" alt="" width="20" height="20">Charts</a><a href="#steps"><img class="ico" src="assets/icons/ai.png" alt="" width="20" height="20">Steps</a><a href="#quality"><img class="ico" src="assets/icons/info.png" alt="" width="20" height="20">Data quality</a><a href="#orthotic"><img class="ico" src="assets/icons/orthotic.png" alt="" width="20" height="20">Orthotic design</a><a href="#report"><img class="ico" src="assets/icons/reports.png" alt="" width="20" height="20">Report</a>
     </nav>
     <span id="apiStatus" class="status-pill" role="status" aria-live="polite"><span class="dot"></span><span id="apiStatusText">Checking API...</span></span>
   </div>
@@ -105,6 +105,17 @@
     <div class="card chart-card"><h3>Total sensor reading across the recording</h3><p class="small muted">Sum of the 32 channels per frame. The vertical line marks the selected frame.</p><div class="chart-box"><canvas id="chTotal" role="img" aria-label="Line chart of the total sensor reading per frame"></canvas></div></div>
     <div class="card chart-card"><div class="card-head" style="margin-bottom:0"><h3>Single sensor across the recording</h3><span class="field" style="display:flex;gap:6px;align-items:center;flex-direction:row"><label for="selSensor">Sensor (CSV index)</label><select id="selSensor" style="min-width:70px"></select></span></div><p class="small muted">Click a sensor on the map to switch.</p><div class="chart-box"><canvas id="chSensor" role="img" aria-label="Line chart of one sensor over time"></canvas></div></div>
     <div class="card chart-card"><h3>Calculated sum vs recorded sumP</h3><p class="small muted" id="cmpNote">&nbsp;</p><div class="chart-box"><canvas id="chCompare" role="img" aria-label="Comparison of calculated sensor sum and the sumP column"></canvas></div></div>
+  </section>
+
+  <section id="steps" class="card" aria-labelledby="stepTitle">
+    <div class="card-head"><h2 id="stepTitle"><img class="ico lg" src="assets/icons/ai.png" alt="" width="32" height="32">Step analysis (label-free ML)</h2><span class="small muted">Describes this recording only. Not a diagnosis or prediction</span></div>
+    <p class="small muted" id="stepMethod"></p>
+    <div class="dq" id="stepStats"></div>
+    <div id="stepStrip" class="step-strip"></div>
+    <ul class="warn-list" id="stepNotes"></ul>
+    <details><summary>Show steps as a table</summary>
+      <div class="table-scroll"><table><thead><tr><th>Step</th><th>Frames</th><th>Length</th><th>Peak total</th><th>Pattern difference</th><th>Status</th></tr></thead><tbody id="stepTable"></tbody></table></div>
+    </details>
   </section>
 
   <section id="quality" class="card" aria-labelledby="dqTitle">
