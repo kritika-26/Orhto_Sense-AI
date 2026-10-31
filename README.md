@@ -1,10 +1,22 @@
 # Plantorix
 
+[![tests](https://github.com/kritika-26/Orhto_Sense-AI/actions/workflows/tests.yml/badge.svg)](https://github.com/kritika-26/Orhto_Sense-AI/actions/workflows/tests.yml)
+**Live demo:** https://plantorix.vercel.app/
+
 **AI-Powered Podiatric Pressure Mapping and Diabetic Orthotic Printing Engine**
 
 A research and educational prototype that loads plantar-pressure recordings from sensorized insoles, shows them as interactive sensor maps and charts, summarises the pressure distribution with transparent statistics, and outlines how orthotic offloading could later be designed.
 
 > **This is not a clinically validated medical device.** It makes no diagnosis, no ulcer-risk prediction and no treatment recommendation.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Dashboard](docs/screenshots/01-dashboard.png) | ![Insole diagram](docs/screenshots/02-insole-diagram.png) |
+| ![Step analysis](docs/screenshots/03-step-analysis.png) | ![Orthotic design](docs/screenshots/04-orthotic-design.png) |
+
+![Recording report](docs/screenshots/05-report.png)
 
 ## What works today
 
@@ -19,7 +31,7 @@ A research and educational prototype that loads plantar-pressure recordings from
 
 ## What it does not do (yet)
 
-- **No machine learning.** Nothing is trained or predicted.
+- **No trained or predictive model.** The only analytics are transparent statistics and a label-free step analysis. There are no diabetic labels in the data, so no risk or ulcer prediction is made.
 - **No confirmed anatomical foot map.** The dataset does not document which CSV column is which physical sensor. The matrix view is labelled *unregistered sensor layout*. The diagram view uses an arrangement that the recordings support but that the authors have not confirmed, and no foot outline is drawn.
 - **`copX` / `copY` are not anatomical.** They fit exactly (R² = 1.0) to a plain 8x4 matrix position of each sensor index, so they are not a real centre of pressure on the foot and the app does not use them.
 - **No pressure units.** Values are raw sensor counts (documented range 0 to 4096), shown as "Recorded sensor value", not kPa.
@@ -116,11 +128,6 @@ This is evidence, not proof. It does not test the medial/lateral direction or th
 2. For any model, first obtain a **labelled** dataset (for example plantar pressure with documented ulcer outcomes, or clinician-labelled high-risk regions), split train and test by participant, and report meaningful metrics with their limits.
 3. Replace the demonstration pocket depth and thickness with parameters validated with clinical input, and a manufacturing-ready geometry (anatomical outline, materials, tolerances).
 
-## Team
-
-Kritika Saxena, Mradul Khandelwal
-
-
 ## Deploy on Vercel
 
 The app is a single FastAPI function that also serves the dashboard, so API and page are always on the same address.
@@ -132,3 +139,11 @@ The app is a single FastAPI function that also serves the dashboard, so API and 
 How it is set up: `pyproject.toml` names the entrypoint `backend.main:app` and the runtime dependencies; `.python-version` selects Python 3.12; `vercel.json` leaves the large motion-capture CSVs and photos out of the function bundle (the app only reads the pressure CSVs, `participants.csv` and the layout file). The bundle stays far below Vercel's 500 MB limit (about 20 MB of data plus about 200 MB of Python packages).
 
 Notes: the free (Hobby) plan is enough for a demo. The first request after a quiet period is slower (cold start). The app never writes to disk, which suits Vercel's read-only filesystem.
+
+## Team
+
+Kritika Saxena, Mradul Khandelwal
+
+## Data attribution
+
+Pressure data: multimodal insole and motion-capture gait dataset, Zenodo record 20156243, licensed CC BY 4.0 (https://zenodo.org/records/20156243).
