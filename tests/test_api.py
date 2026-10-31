@@ -145,3 +145,32 @@ def test_branding_and_vendor_assets_are_served():
         r = client.get(path)
         assert r.status_code == 200, path
         assert len(r.content) > 500, path
+
+
+def test_steps_segmentation_is_consistent_with_the_signal():
+    d = client.get("/api/datasets/P1_M1_L/steps").json()
+    assert len(d["total"]) == d["frame_count"] == len(d["loaded"])
+    assert d["stats"]["complete_steps"] >= 2
+    for s in d["steps"]:
+        assert all(d["loaded"][s["start_frame"]:s["end_frame"] + 1])      # a step is a loaded run
+        assert d["total"][s["peak_frame"]] == s["peak_total"]
+        assert len(s["sensor_peaks"]) == 32
+    assert "not a diagnosis" in d["method"].lower()
+
+
+def test_steps_short_recording_is_reported_honestly():
+    d = client.get("/api/datasets/P15_M3_L/steps").json()
+    assert d["stats"]["complete_steps"] == 0 and d["notes"]
+    assert not any(s["differs"] for s in d["steps"])
+
+
+def test_steps_flags_need_enough_steps():
+    import itertools
+    for rid in ("P7_M3_L", "P1_M1_L"):
+        d = client.get(f"/api/datasets/{rid}/steps").json()
+        flagged = [s for s in d["steps"] if s["differs"]]
+        assert not flagged or d["stats"]["complete_steps"] >= 5
+
+
+def test_steps_unknown_recording_404():
+    assert client.get("/api/datasets/P99_M1_L/steps").status_code == 404
