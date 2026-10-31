@@ -19,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 
 from backend import config
 from backend.schemas import models
-from backend.services import analysis, dataset_service, layout_service, orthotic_service
+from backend.services import analysis, dataset_service, layout_service, orthotic_service, step_service
 from backend.services.dataset_service import (
     DatasetFormatError,
     DatasetNotFoundError,
@@ -157,6 +157,17 @@ def _design_or_http_error(dataset_id, top_percent, depth_mm, base_mm) -> dict:
     except orthotic_service.ParticipantInfoError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
     except orthotic_service.DesignParameterError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@app.get("/api/datasets/{dataset_id}/steps", response_model=models.StepAnalysis)
+def step_analysis(dataset_id: str = DatasetId):
+    """Label-free step segmentation and step-to-step consistency. Descriptive only."""
+    try:
+        return step_service.analyse(dataset_service.load_recording(dataset_id))
+    except DatasetNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Recording '{dataset_id}' not found.")
+    except DatasetFormatError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
 
 
