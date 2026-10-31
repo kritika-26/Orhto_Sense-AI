@@ -175,3 +175,37 @@ class OrthoticDesign(BaseModel):
     outline_mm: List[List[float]]
     warnings: List[str]
     disclaimer: str
+
+
+class StepInfo(BaseModel):
+    step: int
+    start_frame: int
+    end_frame: int
+    frames: int
+    complete: bool
+    peak_total: float
+    peak_frame: int
+    sensor_peaks: List[float]
+    pattern_distance: Optional[float] = None
+    z_score: Optional[float] = None
+    differs: bool
+
+
+class StepStats(BaseModel):
+    complete_steps: int
+    median_frames: Optional[float] = None
+    frames_variation_pct: Optional[float] = None
+    median_pattern_distance: Optional[float] = None
+
+
+class StepAnalysis(BaseModel):
+    dataset_id: str
+    frame_count: int
+    baseline_total: float
+    threshold_total: float
+    loaded: List[bool]
+    total: List[float]
+    steps: List[StepInfo]
+    stats: StepStats
+    notes: List[str]
+    method: str
