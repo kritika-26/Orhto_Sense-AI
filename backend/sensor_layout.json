@@ -1,0 +1,430 @@
+{
+ "status": "supported_by_data_not_confirmed_by_authors",
+ "mapping": "CSV column PressureSensor i = diagram label i+1; _L files use the left diagram, _R files the right diagram.",
+ "method": "research/verify_sensor_layout.py (heel-to-toe timing and neighbour-similarity tests, each compared with 3000 shuffled layouts).",
+ "limits": "Supports the heel-to-toe and neighbour structure of the diagram. Medial/lateral orientation and the author's intent are not tested.",
+ "sides": {
+  "L": {
+   "width": 322.9,
+   "height": 956.9,
+   "radius": 28.8,
+   "sensors": [
+    {
+     "csv_index": 0,
+     "label": 1,
+     "x": 197.5,
+     "y": 37.5
+    },
+    {
+     "csv_index": 1,
+     "label": 2,
+     "x": 89.5,
+     "y": 135.5
+    },
+    {
+     "csv_index": 2,
+     "label": 3,
+     "x": 145.5,
+     "y": 173.5
+    },
+    {
+     "csv_index": 3,
+     "label": 4,
+     "x": 131.5,
+     "y": 70.5
+    },
+    {
+     "csv_index": 4,
+     "label": 5,
+     "x": 129.5,
+     "y": 246.5
+    },
+    {
+     "csv_index": 5,
+     "label": 6,
+     "x": 112.5,
+     "y": 318.5
+    },
+    {
+     "csv_index": 6,
+     "label": 7,
+     "x": 188.5,
+     "y": 329.5
+    },
+    {
+     "csv_index": 7,
+     "label": 8,
+     "x": 62.5,
+     "y": 213.5
+    },
+    {
+     "csv_index": 8,
+     "label": 9,
+     "x": 37.5,
+     "y": 369.5
+    },
+    {
+     "csv_index": 9,
+     "label": 10,
+     "x": 41.5,
+     "y": 290.5
+    },
+    {
+     "csv_index": 10,
+     "label": 11,
+     "x": 140.5,
+     "y": 383.5
+    },
+    {
+     "csv_index": 11,
+     "label": 12,
+     "x": 68.5,
+     "y": 444.5
+    },
+    {
+     "csv_index": 12,
+     "label": 13,
+     "x": 87.5,
+     "y": 678.5
+    },
+    {
+     "csv_index": 13,
+     "label": 14,
+     "x": 92.5,
+     "y": 759.5
+    },
+    {
+     "csv_index": 14,
+     "label": 15,
+     "x": 82.5,
+     "y": 516.5
+    },
+    {
+     "csv_index": 15,
+     "label": 16,
+     "x": 80.5,
+     "y": 595.5
+    },
+    {
+     "csv_index": 16,
+     "label": 17,
+     "x": 257.5,
+     "y": 75.5
+    },
+    {
+     "csv_index": 17,
+     "label": 18,
+     "x": 278.5,
+     "y": 148.5
+    },
+    {
+     "csv_index": 18,
+     "label": 19,
+     "x": 216.5,
+     "y": 184.5
+    },
+    {
+     "csv_index": 19,
+     "label": 20,
+     "x": 190.5,
+     "y": 106.5
+    },
+    {
+     "csv_index": 20,
+     "label": 21,
+     "x": 209.5,
+     "y": 262.5
+    },
+    {
+     "csv_index": 21,
+     "label": 22,
+     "x": 271.5,
+     "y": 310.5
+    },
+    {
+     "csv_index": 22,
+     "label": 23,
+     "x": 253.5,
+     "y": 383.5
+    },
+    {
+     "csv_index": 23,
+     "label": 24,
+     "x": 285.5,
+     "y": 234.5
+    },
+    {
+     "csv_index": 24,
+     "label": 25,
+     "x": 213.5,
+     "y": 919.5
+    },
+    {
+     "csv_index": 25,
+     "label": 26,
+     "x": 229.5,
+     "y": 837.5
+    },
+    {
+     "csv_index": 26,
+     "label": 27,
+     "x": 220.5,
+     "y": 756.5
+    },
+    {
+     "csv_index": 27,
+     "label": 28,
+     "x": 161.5,
+     "y": 864.5
+    },
+    {
+     "csv_index": 28,
+     "label": 29,
+     "x": 161.5,
+     "y": 714.5
+    },
+    {
+     "csv_index": 29,
+     "label": 30,
+     "x": 161.5,
+     "y": 793.5
+    },
+    {
+     "csv_index": 30,
+     "label": 31,
+     "x": 112.5,
+     "y": 919.5
+    },
+    {
+     "csv_index": 31,
+     "label": 32,
+     "x": 94.5,
+     "y": 842.5
+    }
+   ],
+   "evidence": {
+    "steps_used": 488,
+    "loaded_frames_used": 26416,
+    "heel_to_toe_timing": {
+     "spearman_rho": -0.983,
+     "best_of_3000_shuffles": 0.597
+    },
+    "neighbour_similarity": {
+     "spearman_rho": -0.885,
+     "best_of_3000_shuffles": -0.27
+    }
+   }
+  },
+  "R": {
+   "width": 323.0,
+   "height": 957.0,
+   "radius": 28.9,
+   "sensors": [
+    {
+     "csv_index": 0,
+     "label": 1,
+     "x": 243.5,
+     "y": 595.5
+    },
+    {
+     "csv_index": 1,
+     "label": 2,
+     "x": 236.5,
+     "y": 678.5
+    },
+    {
+     "csv_index": 2,
+     "label": 3,
+     "x": 231.5,
+     "y": 759.5
+    },
+    {
+     "csv_index": 3,
+     "label": 4,
+     "x": 241.5,
+     "y": 516.5
+    },
+    {
+     "csv_index": 4,
+     "label": 5,
+     "x": 183.5,
+     "y": 383.5
+    },
+    {
+     "csv_index": 5,
+     "label": 6,
+     "x": 285.5,
+     "y": 369.5
+    },
+    {
+     "csv_index": 6,
+     "label": 7,
+     "x": 255.5,
+     "y": 444.5
+    },
+    {
+     "csv_index": 7,
+     "label": 8,
+     "x": 282.5,
+     "y": 290.5
+    },
+    {
+     "csv_index": 8,
+     "label": 9,
+     "x": 194.5,
+     "y": 246.5
+    },
+    {
+     "csv_index": 9,
+     "label": 10,
+     "x": 211.5,
+     "y": 318.5
+    },
+    {
+     "csv_index": 10,
+     "label": 11,
+     "x": 135.5,
+     "y": 329.5
+    },
+    {
+     "csv_index": 11,
+     "label": 12,
+     "x": 261.5,
+     "y": 213.5
+    },
+    {
+     "csv_index": 12,
+     "label": 13,
+     "x": 133.5,
+     "y": 106.5
+    },
+    {
+     "csv_index": 13,
+     "label": 14,
+     "x": 234.5,
+     "y": 135.5
+    },
+    {
+     "csv_index": 14,
+     "label": 15,
+     "x": 178.5,
+     "y": 173.5
+    },
+    {
+     "csv_index": 15,
+     "label": 16,
+     "x": 192.5,
+     "y": 70.5
+    },
+    {
+     "csv_index": 16,
+     "label": 17,
+     "x": 211.5,
+     "y": 919.5
+    },
+    {
+     "csv_index": 17,
+     "label": 18,
+     "x": 162.5,
+     "y": 714.5
+    },
+    {
+     "csv_index": 18,
+     "label": 19,
+     "x": 162.5,
+     "y": 793.5
+    },
+    {
+     "csv_index": 19,
+     "label": 20,
+     "x": 229.5,
+     "y": 842.5
+    },
+    {
+     "csv_index": 20,
+     "label": 21,
+     "x": 109.5,
+     "y": 919.5
+    },
+    {
+     "csv_index": 21,
+     "label": 22,
+     "x": 94.5,
+     "y": 837.5
+    },
+    {
+     "csv_index": 22,
+     "label": 23,
+     "x": 103.5,
+     "y": 756.5
+    },
+    {
+     "csv_index": 23,
+     "label": 24,
+     "x": 162.5,
+     "y": 864.5
+    },
+    {
+     "csv_index": 24,
+     "label": 25,
+     "x": 114.5,
+     "y": 262.5
+    },
+    {
+     "csv_index": 25,
+     "label": 26,
+     "x": 51.5,
+     "y": 310.5
+    },
+    {
+     "csv_index": 26,
+     "label": 27,
+     "x": 70.5,
+     "y": 383.5
+    },
+    {
+     "csv_index": 27,
+     "label": 28,
+     "x": 37.5,
+     "y": 234.5
+    },
+    {
+     "csv_index": 28,
+     "label": 29,
+     "x": 65.5,
+     "y": 75.5
+    },
+    {
+     "csv_index": 29,
+     "label": 30,
+     "x": 107.5,
+     "y": 184.5
+    },
+    {
+     "csv_index": 30,
+     "label": 31,
+     "x": 45.5,
+     "y": 148.5
+    },
+    {
+     "csv_index": 31,
+     "label": 32,
+     "x": 126.5,
+     "y": 37.5
+    }
+   ],
+   "evidence": {
+    "steps_used": 519,
+    "loaded_frames_used": 25926,
+    "heel_to_toe_timing": {
+     "spearman_rho": -0.974,
+     "best_of_3000_shuffles": 0.66
+    },
+    "neighbour_similarity": {
+     "spearman_rho": -0.883,
+     "best_of_3000_shuffles": -0.384
+    }
+   }
+  }
+ }
+}

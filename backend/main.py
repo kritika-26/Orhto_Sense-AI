@@ -13,12 +13,13 @@ pressures, a clinical status and an offloading depth instead of using data.
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Path, Query
+from fastapi import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend import config
 from backend.schemas import models
-from backend.services import analysis, dataset_service
+from backend.services import analysis, dataset_service, layout_service, orthotic_service
 from backend.services.dataset_service import (
     DatasetFormatError,
     DatasetNotFoundError,
@@ -131,6 +132,58 @@ def dataset_timeseries(
 @app.get("/api/datasets/{dataset_id}/validation", response_model=models.Validation)
 def dataset_validation(dataset_id: str = DatasetId):
     return analysis.validation(_load_or_http_error(dataset_id))
+
+
+@app.get("/api/layout/{side}", response_model=models.Layout)
+def sensor_layout(side: str = Path(..., pattern="^[LR]$")):
+    """Sensor positions from the dataset's numbering diagram, plus the evidence
+    that links CSV columns to diagram labels. Evidence-supported, NOT confirmed
+    by the dataset authors."""
+    try:
+        return layout_service.get_layout(side)
+    except layout_service.LayoutNotAvailableError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+def _design_or_http_error(dataset_id, top_percent, depth_mm, base_mm) -> dict:
+    try:
+        return orthotic_service.design(dataset_id, top_percent, depth_mm, base_mm)
+    except DatasetNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Recording '{dataset_id}' not found.")
+    except DatasetFormatError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except layout_service.LayoutNotAvailableError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except orthotic_service.ParticipantInfoError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except orthotic_service.DesignParameterError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+TopPercent = Query(20, ge=5, le=50, description="Share of sensors (highest peaks) that get a relief pocket")
+DepthMm = Query(3.0, ge=0.5, le=6.0, description="Pocket depth in mm (demonstration value)")
+BaseMm = Query(8.0, ge=4.0, le=12.0, description="Base plate thickness in mm (demonstration value)")
+
+
+@app.get("/api/datasets/{dataset_id}/orthotic", response_model=models.OrthoticDesign)
+def orthotic_design(dataset_id: str = DatasetId, top_percent: int = TopPercent,
+                    depth_mm: float = DepthMm, base_mm: float = BaseMm):
+    """Illustrative insole design from the recording's peak loads. Demonstration only."""
+    return _design_or_http_error(dataset_id, top_percent, depth_mm, base_mm)
+
+
+@app.get("/api/datasets/{dataset_id}/orthotic.stl")
+def orthotic_stl(dataset_id: str = DatasetId, top_percent: int = TopPercent,
+                 depth_mm: float = DepthMm, base_mm: float = BaseMm):
+    """Same design as a binary STL file (units: mm). Demonstration only."""
+    d = _design_or_http_error(dataset_id, top_percent, depth_mm, base_mm)
+    try:
+        data = orthotic_service.build_stl(d)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    name = f"plantorix_{dataset_id}_demo_top{top_percent}_d{depth_mm:g}.stl"
+    return Response(content=data, media_type="model/stl",
+                    headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 
 # Serve the dashboard from the same server, so one command runs everything:
