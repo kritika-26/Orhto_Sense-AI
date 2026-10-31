@@ -137,3 +137,11 @@ def test_orthotic_bad_parameters(query, status):
 
 def test_orthotic_unknown_recording():
     assert client.get("/api/datasets/NOPE/orthotic").status_code == 404
+
+
+def test_branding_and_vendor_assets_are_served():
+    for path in ("/assets/logo-main.png", "/assets/logo-mark.png", "/assets/app-icon.png",
+                 "/assets/icons/reports.png", "/vendor/chart.umd.js"):
+        r = client.get(path)
+        assert r.status_code == 200, path
+        assert len(r.content) > 500, path

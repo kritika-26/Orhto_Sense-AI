@@ -195,3 +195,26 @@ footer { max-width: 105rem; margin: 0 auto; padding: 4px 20px 32px; color: var(-
   .header-inner { padding: 10px 14px; }
 }
 
+
+/* Branding */
+.brand-mark { width: 40px; height: 40px; object-fit: contain; flex: none; }
+.ico { width: 20px; height: 20px; vertical-align: -5px; margin-right: 6px; }
+.ico.lg { width: 32px; height: 32px; vertical-align: -9px; margin-right: 8px; }
+.foot-logo { max-width: min(260px, 70%); height: auto; margin-bottom: 8px; }
+@media (max-width: 40rem) { .nav a .ico { display: none; } }
+
+/* Report */
+.report { margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: #fff; }
+.report h3 { margin: 18px 0 6px; color: var(--teal-800); }
+.rep-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.rep-head img { max-width: 220px; height: auto; }
+.rep-design { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: start; }
+.rep-foot { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 10px; }
+@media (max-width: 40rem) { .rep-design { grid-template-columns: minmax(0, 1fr); } }
+@media print {
+  body.print-report .site-header, body.print-report footer, body.print-report main > *:not(#report),
+  body.print-report #report .card-head, body.print-report #report > p, body.print-report #report .design-actions { display: none !important; }
+  body.print-report #report { box-shadow: none; border: 0; padding: 0; }
+  body.print-report .report { border: 0; padding: 0; }
+  body.print-report { background: #fff; }
+}

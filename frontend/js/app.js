@@ -49,7 +49,7 @@
     $("vStatus").textContent = main; $("sStatus").textContent = sub || " ";
   }
   function setControls(enabled) {
-    ["prevBtn", "nextBtn", "playBtn", "slider", "exportBtn", "designBtn"].forEach(id => { $(id).disabled = !enabled; });
+    ["prevBtn", "nextBtn", "playBtn", "slider", "exportBtn", "designBtn", "reportBtn"].forEach(id => { $(id).disabled = !enabled; });
   }
   function fmt(n) { return Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 }); }
 
@@ -115,6 +115,7 @@
     const token = ++state.loadToken;
     stopPlay(); hideError(); setControls(false);
     state.design = null; $("designResult").classList.add("hidden");
+    $("reportBody").classList.add("hidden"); $("printBtn").disabled = true;
     state.id = id; state.sensorCache = {};
     setDatasetStatus("", "Loading...", id);
     setOverlay('<span><span class="spinner"></span>Loading recording...</span>');
@@ -399,6 +400,49 @@
     try { await showFrame(i); } catch (err) { showError(err.message); }
   }
 
+
+  /* ---------- Printable report (built only from loaded data) ---------- */
+  function sparkline(vals, w, h) {
+    const lo = Math.min(...vals), hi = Math.max(...vals), span = (hi - lo) || 1;
+    const pts = vals.map((v, i) => (i / Math.max(vals.length - 1, 1) * w).toFixed(1) + "," + (h - (v - lo) / span * h).toFixed(1)).join(" ");
+    return '<svg viewBox="0 0 ' + w + " " + h + '" width="100%" height="' + h + '" preserveAspectRatio="none" role="img" aria-label="Total sensor reading per frame"><polyline points="' + pts + '" fill="none" stroke="#0e5a6e" stroke-width="1.5"/></svg>';
+  }
+  function buildReport() {
+    const s = state.summary, v = state.validation, t = state.series, d = state.design;
+    if (!s || !t) return;
+    const sp = v.sump_check;
+    const peakIdx = t.calculated_sum.indexOf(Math.max(...t.calculated_sum));
+    let h = '<header class="rep-head"><img src="assets/logo-main.png" alt="Plantorix" width="220"><div class="small muted">Generated ' + escapeHtml(new Date().toLocaleString()) + '</div></header>';
+    h += "<h3>Recording " + escapeHtml(s.dataset_id) + "</h3>";
+    h += '<dl class="design-dl"><dt>Participant / take / side</dt><dd>' + escapeHtml(s.participant) + " / " + escapeHtml(s.take) + " / " + (s.side === "L" ? "left" : "right") + "</dd>" +
+      "<dt>File</dt><dd>" + escapeHtml(s.filename) + "</dd>" +
+      "<dt>Frames x columns</dt><dd>" + v.rows + " x " + v.columns + "</dd>" +
+      "<dt>Sensor channels</dt><dd>" + v.sensor_channels + "</dd>" +
+      "<dt>Value range</dt><dd>" + s.value_min + " to " + s.value_max + " (raw counts, not kPa)</dd>" +
+      "<dt>Highest total reading</dt><dd>" + fmt(Math.max(...t.calculated_sum)) + " at frame " + peakIdx + "</dd></dl>";
+    h += "<h3>Total sensor reading across the recording</h3>" + sparkline(t.calculated_sum, 600, 90);
+    h += "<h3>Data quality</h3><ul><li>Missing values: " + v.missing_values + "</li><li>Sensor sum vs sumP: " +
+      (!sp.available ? "sumP not available" : sp.matches_exactly ? "identical in all " + v.rows + " frames" : sp.frames_with_difference + " frame(s) differ (max " + sp.max_abs_difference + ")") + "</li>" +
+      v.warnings.map(w => "<li>" + escapeHtml(w) + "</li>").join("") + (s.known_issue ? "<li>Dataset note: " + escapeHtml(s.known_issue) + "</li>" : "") + "</ul>";
+    h += "<h3>Sensor layout</h3><p class='small'>" + (s.sensor_layout_verified ? "Verified." : "Supported by the data (heel-to-toe timing and neighbour similarity tests) but not confirmed by the dataset authors.") + "</p>";
+    if (d) {
+      h += "<h3>Illustrative orthotic design</h3>" +
+        '<div class="rep-design"><svg viewBox="' + $("designSvg").getAttribute("viewBox") + '" height="320" role="img" aria-label="Insole with relief pockets">' + $("designSvg").innerHTML + "</svg><div>" +
+        '<dl class="design-dl">' + $("designDl").innerHTML + "</dl>" +
+        "<table><thead><tr><th>Zone</th><th>Position</th><th>Sensors</th><th>Peak</th></tr></thead><tbody>" + $("zoneTable").innerHTML + "</tbody></table></div></div>" +
+        '<p class="small">' + escapeHtml(d.disclaimer) + "</p>";
+    } else h += "<h3>Illustrative orthotic design</h3><p class='small muted'>Not generated for this recording yet.</p>";
+    h += '<p class="small rep-foot"><b>Research and educational prototype.</b> Not a diagnosis, risk prediction or clinically validated device. The dataset contains healthy volunteers. Data: Zenodo 20156243, CC BY 4.0.</p>';
+    const el = $("reportBody"); el.innerHTML = h; el.classList.remove("hidden");
+    $("printBtn").disabled = false;
+  }
+  function printReport() {
+    if ($("reportBody").classList.contains("hidden")) buildReport();
+    document.body.classList.add("print-report");
+    const done = () => { document.body.classList.remove("print-report"); window.removeEventListener("afterprint", done); };
+    window.addEventListener("afterprint", done); window.print();
+  }
+
   /* ---------- Wiring ---------- */
   function init() {
     const sel = $("selSensor");
@@ -429,6 +473,8 @@
     [["dsTop", "dsTopOut"], ["dsDepth", "dsDepthOut"], ["dsBase", "dsBaseOut"]].forEach(([i, o]) =>
       $(i).addEventListener("input", e => { $(o).textContent = e.target.value; }));
     $("designBtn").addEventListener("click", generateDesign);
+    $("reportBtn").addEventListener("click", buildReport);
+    $("printBtn").addEventListener("click", printReport);
     $("stlBtn").addEventListener("click", downloadStl);
     $("designJsonBtn").addEventListener("click", downloadDesignJson);
     $("retryBtn").addEventListener("click", () => {

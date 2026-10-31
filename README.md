@@ -14,6 +14,7 @@ A research and educational prototype that loads plantar-pressure recordings from
 - Two sensor views: a plain **sensor matrix** (ordered by CSV index) and an **insole diagram** view that places the sensors as on the dataset's numbering diagram. The diagram view is supported by data tests but not confirmed by the dataset authors (see below).
 - Calculations are plain descriptive statistics on the real sensor values: mean, maximum, minimum, total, sensors above the frame average, and a check of the sensor sum against the recorded `sumP` column.
 - Raw data is only read, never modified.
+- **Branding and report (Phase 7):** Plantorix logo, app icon and icon set (`frontend/assets/`), and a printable one-page **Recording report** (summary, data quality, layout status, optional orthotic design) that can be saved as PDF from the browser. Chart.js is bundled in `frontend/vendor/` so the demo works offline.
 
 ## What it does not do (yet)
 
