@@ -95,3 +95,83 @@ class Validation(BaseModel):
     available_columns: List[str]
     sump_check: SumPCheck
     warnings: List[str]
+
+
+class SensorPosition(BaseModel):
+    csv_index: int
+    label: int
+    x: float
+    y: float
+
+
+class EvidenceTest(BaseModel):
+    spearman_rho: float
+    best_of_3000_shuffles: float
+
+
+class LayoutEvidence(BaseModel):
+    steps_used: int
+    loaded_frames_used: int
+    heel_to_toe_timing: EvidenceTest
+    neighbour_similarity: EvidenceTest
+
+
+class Layout(BaseModel):
+    side: str
+    status: str
+    mapping: str
+    method: str
+    limits: str
+    width: float
+    height: float
+    radius: float
+    sensors: List[SensorPosition]
+    evidence: LayoutEvidence
+
+
+class DesignParameters(BaseModel):
+    top_percent: int
+    relief_depth_mm: float
+    base_thickness_mm: float
+    peak_definition: str
+    values_are_demonstration_only: bool
+
+
+class DesignDimensions(BaseModel):
+    length: float
+    width: float
+    thickness: float
+
+
+class DesignZone(BaseModel):
+    id: str
+    sensor_indices: List[int]
+    peak_value: int
+    centre_x_mm: float
+    centre_y_mm: float
+    position_along_insole: str
+
+
+class DesignSensor(BaseModel):
+    csv_index: int
+    label: int
+    x_mm: float
+    y_mm: float
+    peak_value: int
+    selected: bool
+    zone: Optional[str] = None
+
+
+class OrthoticDesign(BaseModel):
+    dataset_id: str
+    side: str
+    parameters: DesignParameters
+    dimensions_mm: DesignDimensions
+    scale_basis: str
+    pocket_radius_mm: float
+    selected_count: int
+    zones: List[DesignZone]
+    sensors: List[DesignSensor]
+    outline_mm: List[List[float]]
+    warnings: List[str]
+    disclaimer: str
