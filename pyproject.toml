@@ -1,0 +1,23 @@
+[project]
+name = "plantorix"
+version = "0.1.0"
+description = "Plantar pressure analysis and orthotic design research prototype"
+requires-python = ">=3.12,<3.14"
+# Runtime dependencies for Vercel (uvicorn is only needed for local runs; see requirements.txt)
+dependencies = [
+    "fastapi>=0.110",
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "pydantic>=2.0",
+    "trimesh>=4.0",
+    "shapely>=2.0",
+    "mapbox-earcut>=1.0",
+    "manifold3d>=2.4",
+]
+
+[tool.vercel]
+entrypoint = "backend.main:app"
+
+# Serve the dashboard from the function too, so API and page are always same-origin
+[tool.vercel.fastapi.static]
+cdn = false

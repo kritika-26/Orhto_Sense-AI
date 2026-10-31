@@ -45,6 +45,16 @@ Check the setup: `python -m backend.config` should report 310 pressure files. Ru
 
 The dashboard loads Chart.js from the internet (cdnjs), so the first load needs a connection.
 
+## Deploy (Docker, e.g. Render free tier)
+
+One container serves both the API and the dashboard, so there is no CORS or second host to set up. The image keeps only the 310 pressure CSVs, `participants.csv` and `info.txt` (about 18 MB; see `.dockerignore`).
+
+1. Push the repo to GitHub, including `data/raw/InsolesOpitrackDataset/` (the dataset is CC BY 4.0, keep the attribution in the footer).
+2. On https://render.com: **New > Blueprint**, choose this repo. `render.yaml` creates a free Docker web service with health check `/api/health`.
+3. Wait for the build. Open the service URL: the dashboard is at `/` and the API docs at `/docs`.
+
+Free instances sleep after inactivity, so the first request can take 30 to 60 seconds. Open the URL a minute before a demo. Local test of the same image: `docker build -t plantorix .` then `docker run -p 8000:8000 plantorix`.
+
 ## Dataset
 
 Multimodal gait dataset with synchronized sensorized-insole pressure and OptiTrack motion capture: [Zenodo record 20156243](https://zenodo.org/records/20156243), licence CC BY 4.0. Download and extract it to `data/raw/InsolesOpitrackDataset/` (or set the `PLANTORIX_DATASET_DIR` environment variable). Layout: `P<n>/<take>/<take>_Preassure_<L|R>.csv` (the dataset's own spelling). The dataset's `info.txt` flags P13 M1 (insole desynchronisation) and P3 M8 (motion-capture errors); the dashboard shows these as warnings.
@@ -109,3 +119,16 @@ This is evidence, not proof. It does not test the medial/lateral direction or th
 ## Team
 
 Kritika Saxena, Mradul Khandelwal
+
+
+## Deploy on Vercel
+
+The app is a single FastAPI function that also serves the dashboard, so API and page are always on the same address.
+
+1. Push the project to GitHub (including `data/raw/InsolesOpitrackDataset`, which holds the CC BY 4.0 dataset; keep the attribution in the footer).
+2. On vercel.com choose **Add New, Project**, import the repository, leave the framework preset on **FastAPI** (detected from `pyproject.toml`) and press **Deploy**. No environment variables are needed.
+3. Open the deployment URL. `/api/health` should show `ok` and 310 recordings.
+
+How it is set up: `pyproject.toml` names the entrypoint `backend.main:app` and the runtime dependencies; `.python-version` selects Python 3.12; `vercel.json` leaves the large motion-capture CSVs and photos out of the function bundle (the app only reads the pressure CSVs, `participants.csv` and the layout file). The bundle stays far below Vercel's 500 MB limit (about 20 MB of data plus about 200 MB of Python packages).
+
+Notes: the free (Hobby) plan is enough for a demo. The first request after a quiet period is slower (cold start). The app never writes to disk, which suits Vercel's read-only filesystem.

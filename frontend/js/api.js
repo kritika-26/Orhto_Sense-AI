@@ -1,12 +1,16 @@
 /* Plantorix - API client.
    Base URL, in order of priority:
      1. ?api=http://host:port in the page address
-     2. same origin, when the page is served by FastAPI on port 8000
-     3. http://127.0.0.1:8000 (e.g. when the page is opened from Live Server) */
+     2. same origin, when the page is served by FastAPI (port 8000 locally, or any
+        deployed host such as Vercel)
+     3. http://127.0.0.1:8000 (only when the page is opened from a local dev server
+        on another port, e.g. Live Server) */
 const Api = (() => {
   const fromQuery = new URLSearchParams(window.location.search).get("api");
-  const base = (fromQuery ||
-    (window.location.port === "8000" ? "" : "http://127.0.0.1:8000")).replace(/\/$/, "");
+  const host = window.location.hostname;
+  const isLocalHost = host === "localhost" || host === "127.0.0.1" || host === "[::1]";
+  const sameOrigin = !isLocalHost || window.location.port === "8000";
+  const base = (fromQuery || (sameOrigin ? "" : "http://127.0.0.1:8000")).replace(/\/$/, "");
 
   async function get(path, timeoutMs = 15000, as = "json") {
     const ctl = new AbortController();
